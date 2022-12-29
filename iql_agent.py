@@ -53,7 +53,7 @@ class IQLAgent:
         :return: The action.
         """
         self.plays += 1
-        self.temperature = 1000 * pow(0.94, self.plays)
+        self.temperature = max(1000 * pow(0.94, self.plays), 0.0001)
         evaluations = self.compute_evaluations()
         probabilities = np.zeros(self.num_actions)
         to_exp = [ev / self.temperature for ev in evaluations]
