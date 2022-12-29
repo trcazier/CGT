@@ -1,6 +1,7 @@
 import networkx as nx
 import random
 import matplotlib.pyplot as plt
+import math
 
 def generate_graph(n_nodes: int, degree: int):
     if degree == n_nodes-1:
@@ -36,13 +37,24 @@ def generate_graph(n_nodes: int, degree: int):
         return graph
 
 if __name__ == "__main__":
-    # test
-    for n in range(5, 10):
+    # tests the validity of a lot of graphs
+    for nod in range(5, 10):
         for deg in range(0, 4):
-            print(f"{n}/10, {deg}/4")
+            print(f"{nod}/10, {deg}/4")
             for i in range(10000):
-                G = generate_graph(n, deg)
+                G = generate_graph(nod, deg)
                 for node in list(G.nodes):
                     assert G.out_degree(node) == deg
                 # nx.draw(G)
                 # plt.show()
+    for G in [
+        generate_graph(5, 0), # IG
+        generate_graph(5, 2), # LJAL-2
+        generate_graph(5, 3), # LJAL-3
+        generate_graph(5, 4) # JAL
+    ]:
+        nx.draw(G)
+        plt.show()
+    
+    
+    
