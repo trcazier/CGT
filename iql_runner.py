@@ -35,7 +35,7 @@ def train_iql(env: NArmedBanditGame, graph, t_max: int) -> Tuple[List[IQLAgent],
     :return: Tuple containing the list of agents, the returns of all training episodes, the averaged evaluation
     return of each evaluation, and the list of the greedy joint action of each evaluation.
     """
-    agents = [IQLAgent(4, graph.neighbors(i)) for i in range(0, 5)]
+    agents = [IQLAgent(4, list(graph.neighbors(i))) for i in range(0, 5)]
     returns = np.zeros(t_max)
     counter = 0
     m = 0
@@ -49,13 +49,22 @@ def train_iql(env: NArmedBanditGame, graph, t_max: int) -> Tuple[List[IQLAgent],
 
 
 if __name__ == '__main__':
-    totals = 0
-    for i in range(0, 10000):
-        if i % 1000 == 0:
-            print(i)
-        env = NArmedBanditGame(5, 4)
-        graph = generate_graph(5, 4)
-        number_of_iterations = 100
-        agents, returns, m = train_iql(env, graph, 200)
-        totals += returns[-1]
-    print(totals/10000)
+    totals = np.array([np.zeros(200) for i in range(0, 4)])
+    ctr = 0
+    labels = ["IQL", "LJAL-2", "LJAL-3", "JAL"]
+    for edges in [0, 2, 3, 4]:
+        for i in range(0, 1000):
+            if i % 1000 == 0:
+                print(i)
+            env = NArmedBanditGame(5, 4)
+            graph = generate_graph(5, edges)
+            agents, returns, m = train_iql(env, graph, 200)
+            totals[ctr] += returns
+        totals[ctr] = totals[ctr]/1000
+        ctr += 1
+
+    for i in range(0, len(totals)):
+        plt.plot(totals[i], label=labels[i])
+
+    plt.legend()
+    plt.show()

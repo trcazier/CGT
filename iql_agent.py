@@ -1,5 +1,6 @@
 import numpy as np
-import math
+import json
+
 
 class IQLAgent:
     """
@@ -28,14 +29,19 @@ class IQLAgent:
 
         return counts
 
+    def calculate_frequencies_product(self, n_actions):
+        frequency_product = 1
+        for idx, action in enumerate(n_actions):
+            frequency_product *= self.neighbours_counts[(self.neighbours[idx], action)] / \
+                                 sum([self.neighbours_counts[(self.neighbours[idx], action2)]
+                                      for action2 in range(0, self.num_actions)])
+        return frequency_product
+
     def compute_evaluations(self) -> np.array:
         evaluations = np.zeros(self.num_actions)
         for action in range(0, self.num_actions):
-            frequencies = [
-                self.neighbours_counts[(neighbour, action)] / sum(self.neighbours_counts[(neighbour, action2)]
-                                                                  for action2 in range(0, self.num_actions))
-                for neighbour in self.neighbours]
-            evaluations[action] = sum(self.q_table[(a, n_actions)] * np.prod(frequencies) for (a, n_actions)
+            evaluations[action] = sum(self.q_table[(a, n_actions)]
+                                      * self.calculate_frequencies_product(json.loads(n_actions)) for (a, n_actions)
                                       in self.q_table if a == action)
         return evaluations
 
@@ -47,14 +53,17 @@ class IQLAgent:
         :return: The action.
         """
         self.plays += 1
-        self.temperature = max(1000 * pow(0.94, self.plays), 0.1)
+        self.temperature = 1000 * pow(0.94, self.plays)
         evaluations = self.compute_evaluations()
         probabilities = np.zeros(self.num_actions)
-        total_sum = sum(np.exp(ev / self.temperature) for ev in evaluations)
+        to_exp = [ev / self.temperature for ev in evaluations]
+        diff = max(to_exp) - 700
+        if diff > 0:
+            to_exp = list(map(lambda x: x - diff, to_exp))
+        total_sum = sum(np.exp(x) for x in to_exp)
 
         for action in range(0, self.num_actions):
-            ev = evaluations[action]
-            p = np.exp(ev / self.temperature) / total_sum
+            p = np.exp(to_exp[action]) / total_sum
             if np.isnan(p):
                 probabilities[action] = 1
             else:
@@ -80,7 +89,7 @@ class IQLAgent:
                     self.neighbours_counts[(agent, action)] = 1
                 neighbour_actions += [action]
 
-        neighbour_actions = str(neighbour_actions)
+        neighbour_actions = json.dumps(list(map(lambda x: int(x), neighbour_actions)))
 
         if not (act, neighbour_actions) in self.q_table:
             self.q_table[(act, neighbour_actions)] = 0
