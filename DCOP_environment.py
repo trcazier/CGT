@@ -17,10 +17,25 @@ class DCOPGame:
         self.initialize_weights_and_rewards()
 
     def initialize_weights_and_rewards(self):
-        self.graph = generate_random_graph(self.num_agents, self.num_agents-1, False) # undirected complete graph
-        self.weights = {}
+        """
+        This function is used to initialize the weights and rewards for each
+        action of both agents connected by an edge in the graph.
+        The variant implemented in this function is the graph in fig. 5 of the paper.
+        another function can be created and used in __init__ instead if another
+        scenario is being tested.
 
-        edges_09 = [(1,2), (2,3), (1,3)]
+        The rewards are implemented like this:
+        Each edge of the graph represents a binary constraint and has 2 nodes connected
+        to it. Therefore, for every edge, there is a (n_actions * n_actions) matrix
+        containing the rewards for that specific edge. The global reward is then
+        obtained by adding all the rewards multiplied by their weight together.
+        """
+        self.graph = generate_random_graph(self.num_agents, self.num_agents-1, False) # undirected complete graph
+        self.weights = {} # weights of all the edges of the graph
+
+        # edges that have a weight value of 0.9 (edges in dark grey fig.5)
+        edges_09 = [(1,2), (2,3), (1,3)] 
+        # the rest have a weight of 0.1
         for (a, b) in list(self.graph.edges):
             if (a, b) in edges_09:
                 self.weights[(a, b)] = 0.9
@@ -29,7 +44,7 @@ class DCOPGame:
             else:
                 self.weights[(a, b)] = 0.1
         
-        self.rewards = {}
+        self.rewards = {} # rewards of all the edges of the graph
         for c in self.weights.keys(): # for each constraint
             # N(0, sigma*w_i) with sigma = 10 * # agents
             # n_actions per agent -> each edge has a n_actions * n_actions payoff matrix
