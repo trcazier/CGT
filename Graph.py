@@ -3,15 +3,20 @@ import random
 import matplotlib.pyplot as plt
 import math
 
-def generate_graph(n_nodes: int, degree: int):
+def generate_random_graph(n_nodes: int, degree: int, directed: bool=True):
+    if directed:
+        gtype = nx.DiGraph() 
+    else:
+        gtype = nx.Graph() 
+    
     if degree == n_nodes-1:
-        return nx.complete_graph(n_nodes, nx.DiGraph())
+        return nx.complete_graph(n_nodes, gtype)
     if degree == 0:
-        return nx.empty_graph(n_nodes, nx.DiGraph())
+        return nx.empty_graph(n_nodes, gtype)
     else: 
         # generate a complete graph and then remove random edges until all
         # the nodes have the right degree
-        graph = nx.complete_graph(n_nodes, nx.DiGraph())
+        graph = nx.complete_graph(n_nodes, gtype)
 
         # list of all the node degrees
         n_degrees = [n_nodes-1 for _ in range(n_nodes)]
@@ -36,22 +41,24 @@ def generate_graph(n_nodes: int, degree: int):
         
         return graph
 
+
+
 if __name__ == "__main__":
     # tests the validity of a lot of graphs
     for nod in range(5, 10):
         for deg in range(0, 4):
             print(f"{nod}/10, {deg}/4")
             for i in range(10000):
-                G = generate_graph(nod, deg)
+                G = generate_random_graph(nod, deg)
                 for node in list(G.nodes):
                     assert G.out_degree(node) == deg
                 # nx.draw(G)
                 # plt.show()
     for G in [
-        generate_graph(5, 0), # IG
-        generate_graph(5, 2), # LJAL-2
-        generate_graph(5, 3), # LJAL-3
-        generate_graph(5, 4) # JAL
+        generate_random_graph(5, 0), # IG
+        generate_random_graph(5, 2), # LJAL-2
+        generate_random_graph(5, 3), # LJAL-3
+        generate_random_graph(5, 4) # JAL
     ]:
         nx.draw(G)
         plt.show()
