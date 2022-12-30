@@ -2,7 +2,7 @@ import numpy as np
 import json
 
 
-class IQLAgent:
+class LJALAgent:
     """
     The agent class for exercise 1.
     """

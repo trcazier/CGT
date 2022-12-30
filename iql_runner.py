@@ -4,7 +4,7 @@ import numpy as np
 from numpy import ndarray
 
 from Graph import generate_graph
-from iql_agent import IQLAgent
+from LJAL_agent import LJALAgent
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -23,7 +23,7 @@ def run_episode(env: NArmedBanditGame, agents, training: bool) -> float:
     return rew
 
 
-def train_iql(env: NArmedBanditGame, graph, t_max: int) -> Tuple[List[IQLAgent], ndarray]:
+def train_LJAL(env: NArmedBanditGame, graph, t_max: int) -> Tuple[List[LJALAgent], ndarray]:
     """
     Training loop.
 
@@ -35,7 +35,7 @@ def train_iql(env: NArmedBanditGame, graph, t_max: int) -> Tuple[List[IQLAgent],
     :return: Tuple containing the list of agents, the returns of all training episodes, the averaged evaluation
     return of each evaluation, and the list of the greedy joint action of each evaluation.
     """
-    agents = [IQLAgent(4, list(graph.neighbors(i))) for i in range(0, 5)]
+    agents = [LJALAgent(4, list(graph.neighbors(i))) for i in range(0, 5)]
     returns = np.zeros(t_max)
     counter = 0
     m = 0
@@ -58,7 +58,7 @@ if __name__ == '__main__':
                 print(i)
             env = NArmedBanditGame(5, 4)
             graph = generate_graph(5, edges)
-            agents, returns, m = train_iql(env, graph, 200)
+            agents, returns, m = train_LJAL(env, graph, 200)
             totals[ctr] += returns
         totals[ctr] = totals[ctr]/1000
         ctr += 1
