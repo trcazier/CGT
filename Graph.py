@@ -42,12 +42,44 @@ def generate_random_graph(n_nodes: int, degree: int, directed: bool=True):
         return graph
 
 
+def DCOP_generate_IL():
+    return generate_random_graph(7, 0)
+
+def DCOP_generate_JAL():
+    return generate_random_graph(7, 6)
+
+def DCOP_generate_JLAL_1():
+    return generate_random_graph(7, 2)
+
+def DCOP_generate_JLAL_2():
+    graph = generate_random_graph(7, 0)
+
+    graph.add_edge(1,2)
+    graph.add_edge(2,1)
+
+    graph.add_edge(2,3)
+    graph.add_edge(3,2)
+
+    graph.add_edge(1,3)
+    graph.add_edge(3,1)
+
+    graph.add_edge(5,6)
+    graph.add_edge(6,5)
+
+    return graph
+
+def DCOP_generate_JLAL_3():
+    graph = DCOP_generate_JLAL_2()
+    graph.add_edge(1,5)
+    graph.add_edge(5,1)
+    return graph
+
 
 if __name__ == "__main__":
     # tests the validity of a lot of graphs
     for nod in range(5, 10):
         for deg in range(0, 4):
-            print(f"{nod}/10, {deg}/4")
+            print(f"{nod+1}/10, {deg+1}/4")
             for i in range(10000):
                 G = generate_random_graph(nod, deg)
                 for node in list(G.nodes):
@@ -58,7 +90,13 @@ if __name__ == "__main__":
         generate_random_graph(5, 0), # IG
         generate_random_graph(5, 2), # LJAL-2
         generate_random_graph(5, 3), # LJAL-3
-        generate_random_graph(5, 4) # JAL
+        generate_random_graph(5, 4), # JAL
+
+        DCOP_generate_IL(),
+        DCOP_generate_JAL(),
+        DCOP_generate_JLAL_1(),
+        DCOP_generate_JLAL_2(),
+        DCOP_generate_JLAL_3()
     ]:
         nx.draw(G)
         plt.show()
