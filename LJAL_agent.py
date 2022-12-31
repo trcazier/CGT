@@ -4,7 +4,7 @@ import json
 
 class LJALAgent:
     """
-    The agent class for exercise 1.
+    The agent class for par 3.2.
     """
 
     def __init__(self,
