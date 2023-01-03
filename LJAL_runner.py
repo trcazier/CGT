@@ -38,14 +38,11 @@ def train_LJAL(env: NArmedBanditGame, graph, t_max: int) -> Tuple[List[LJALAgent
     agents = [LJALAgent(4, list(graph.neighbors(i))) for i in range(5)]
     returns = np.zeros(t_max)
     counter = 0
-    m = 0
     while counter < t_max:
         rew = run_episode(env, agents, True)
         returns[counter] = rew
-        m = max(rew, m)
         counter += 1
-
-    return agents, returns, m
+    return agents, returns
 
 
 if __name__ == '__main__':
@@ -58,7 +55,7 @@ if __name__ == '__main__':
                 print(i)
             env = NArmedBanditGame(5, 4)
             graph = generate_random_graph(5, edges)
-            agents, returns, m = train_LJAL(env, graph, 200)
+            agents, returns = train_LJAL(env, graph, 200)
             totals[ctr] += returns
         totals[ctr] = totals[ctr]/1000
         ctr += 1

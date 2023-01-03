@@ -4,7 +4,7 @@ from typing import Tuple, List
 import numpy as np
 from numpy import ndarray
 
-from Graph import DCOP_generate_IL, DCOP_generate_JAL, DCOP_generate_JLAL_1, DCOP_generate_JLAL_2, DCOP_generate_JLAL_3
+from Graph import DCOP_generate_IL, DCOP_generate_JAL, DCOP_generate_LJAL_1, DCOP_generate_LJAL_2, DCOP_generate_LJAL_3
 from LJAL_agent import LJALAgent
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -39,13 +39,11 @@ def train_DCOP(env: DCOPGame, graph, t_max: int) -> Tuple[List[LJALAgent], ndarr
     agents = [LJALAgent(env.num_actions, list(graph.neighbors(i))) for i in range(env.num_agents)]
     returns = np.zeros(t_max)
     counter = 0
-    m = 0
     while counter < t_max:
         rew = run_episode(env, agents, True)
         returns[counter] = rew
-        m = max(rew, m)
         counter += 1
-    return agents, returns, m
+    return agents, returns
 
 
 if __name__ == '__main__':
@@ -54,30 +52,29 @@ if __name__ == '__main__':
     num_plays = 200
     num_agents = 7
     num_actions = 4
+    runs = 1000
 
     labels = ["IL", "JAL", "LJAL-1", "LJAL-2", "LJAL-3"]
     graphs = [
         DCOP_generate_IL(),
         DCOP_generate_JAL(),
-        DCOP_generate_JLAL_1(),
-        DCOP_generate_JLAL_2(),
-        DCOP_generate_JLAL_3()
+        DCOP_generate_LJAL_1(),
+        DCOP_generate_LJAL_2(),
+        DCOP_generate_LJAL_3()
     ]
     
     totals = np.array([np.zeros(num_plays) for _ in range(len(graphs))])
 
     for graph in graphs:
         t1 = time.time()
-        for i in range(1000):
-            if i % 1000 == 0:
-                print(i)
+        for i in range(runs):
             env = DCOPGame(num_agents, num_actions)
-            agents, returns, m = train_DCOP(env, graph, num_plays)
+            agents, returns = train_DCOP(env, graph, num_plays)
             totals[ctr] += returns
-        totals[ctr] = totals[ctr]/1000
+        totals[ctr] = totals[ctr]/runs
         ctr += 1
         t2 = time.time()
-        print("time: ", t2-t1)
+        print(f"{labels[ctr]} time: ", t2-t1)
 
     for i in range(len(totals)):
         plt.plot(totals[i], label=labels[i])
