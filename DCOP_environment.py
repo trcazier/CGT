@@ -37,7 +37,7 @@ class DCOPGame:
         self.weights = {} # weights of all the edges of the graph
 
         # edges that have a weight value of 0.9 (edges in dark grey fig.5)
-        edges_09 = [(1,2), (2,3), (1,3)] 
+        edges_09 = [(1,2), (2,3), (1,3), (5,6)]
         # the rest have a weight of 0.1
         for (a, b) in list(self.graph.edges):
             if (a, b) in edges_09:
