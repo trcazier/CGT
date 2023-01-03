@@ -2,6 +2,7 @@ import networkx as nx
 import random
 import matplotlib.pyplot as plt
 import math
+from itertools import permutations
 
 def generate_random_graph(n_nodes: int, degree: int, directed: bool=True):
     if directed:
@@ -73,6 +74,24 @@ def DCOP_generate_JLAL_3():
     graph.add_edge(1,5)
     graph.add_edge(5,1)
     return graph
+
+def GC_generate_OPTJLAL(c):
+    graph = generate_random_graph(7, 0)
+    perm = list(permutations(range(7)))
+    for n in range(0, 7):
+        if c == 1:
+            choice = random.randint(0, 7)
+            if n != choice:
+                graph.add_edge(n, choice)
+        if c == 2:
+            choice = random.randint(0, len(perm))
+            if perm[choice][0] != n:
+                graph.add_edge(n, perm[choice][0])
+            if perm[choice][1] != n:
+                graph.add_edge(n, perm[choice][1])
+    return graph
+
+
 
 
 if __name__ == "__main__":
