@@ -6,7 +6,7 @@ from numpy import ndarray
 from DCOP_environment import DCOPGame
 from DCOP_runner import train_DCOP
 
-from Graph import DCOP_generate_IL, DCOP_generate_JAL, DCOP_generate_JLAL_1, DCOP_generate_JLAL_2, DCOP_generate_JLAL_3, GC_generate_OPTJLAL
+from Graph import DCOP_generate_IL, DCOP_generate_JAL, DCOP_generate_LJAL_1, DCOP_generate_LJAL_2, DCOP_generate_LJAL_3
 from LJAL_agent import LJALAgent
 import matplotlib.pyplot as plt
 import pandas as pd
