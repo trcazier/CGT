@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import math
 from itertools import permutations
 
+
 def generate_random_graph(n_nodes: int, degree: int, directed: bool=True):
     if directed:
         gtype = nx.DiGraph() 
@@ -49,10 +50,10 @@ def DCOP_generate_IL():
 def DCOP_generate_JAL():
     return generate_random_graph(7, 6)
 
-def DCOP_generate_JLAL_1():
+def DCOP_generate_LJAL_1():
     return generate_random_graph(7, 2)
 
-def DCOP_generate_JLAL_2():
+def DCOP_generate_LJAL_2():
     graph = generate_random_graph(7, 0)
 
     graph.add_edge(1,2)
@@ -69,29 +70,11 @@ def DCOP_generate_JLAL_2():
 
     return graph
 
-def DCOP_generate_JLAL_3():
-    graph = DCOP_generate_JLAL_2()
+def DCOP_generate_LJAL_3():
+    graph = DCOP_generate_LJAL_2()
     graph.add_edge(1,5)
     graph.add_edge(5,1)
     return graph
-
-def GC_generate_OPTJLAL(c):
-    graph = generate_random_graph(7, 0)
-    perm = list(permutations(range(7)))
-    for n in range(0, 7):
-        if c == 1:
-            choice = random.randint(0, 7)
-            if n != choice:
-                graph.add_edge(n, choice)
-        if c == 2:
-            choice = random.randint(0, len(perm))
-            if perm[choice][0] != n:
-                graph.add_edge(n, perm[choice][0])
-            if perm[choice][1] != n:
-                graph.add_edge(n, perm[choice][1])
-    return graph
-
-
 
 
 if __name__ == "__main__":
@@ -113,9 +96,9 @@ if __name__ == "__main__":
 
         DCOP_generate_IL(),
         DCOP_generate_JAL(),
-        DCOP_generate_JLAL_1(),
-        DCOP_generate_JLAL_2(),
-        DCOP_generate_JLAL_3()
+        DCOP_generate_LJAL_1(),
+        DCOP_generate_LJAL_2(),
+        DCOP_generate_LJAL_3()
     ]:
         nx.draw(G)
         plt.show()
