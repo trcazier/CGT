@@ -3,6 +3,8 @@ from typing import Tuple, List
 
 import numpy as np
 from numpy import ndarray
+from DCOP_environment import DCOPGame
+from DCOP_runner import train_DCOP
 
 from Graph import DCOP_generate_IL, DCOP_generate_JAL, DCOP_generate_JLAL_1, DCOP_generate_JLAL_2, DCOP_generate_JLAL_3, GC_generate_OPTJLAL
 from LJAL_agent import LJALAgent
@@ -12,19 +14,16 @@ import pandas as pd
 from CG_environment import CGGame
 
 
-def run_episode(env: CGGame, agents, training: bool) -> float:
-    actions = [agent.act(training=training) for agent in agents]
+def run_episode(env: CGGame, meta_agents, training: bool) -> float:
+
+    actions = [meta_agent.act(training=training) for meta_agent in meta_agents]
     rew = env.act(actions)
-    for i in range(len(agents)):
-        other_actions = {}
-        for (idx, action) in enumerate(actions):
-            if idx != i:
-                other_actions[idx] = action
-        agents[i].learn(actions[i], other_actions, rew)
+    for i in range(len(meta_agents)):
+        meta_agents[i].learn(actions[i], [], rew)
     return rew
 
 
-def train_DCOP(env: CGGame, graph, t_max: int) -> Tuple[List[LJALAgent], ndarray]:
+def train_CG(env: CGGame, t_max: int) -> Tuple[List[LJALAgent], ndarray]:
     """
     Training loop.
 
@@ -36,51 +35,64 @@ def train_DCOP(env: CGGame, graph, t_max: int) -> Tuple[List[LJALAgent], ndarray
     :return: Tuple containing the list of agents, the returns of all training episodes, the averaged evaluation
     return of each evaluation, and the list of the greedy joint action of each evaluation.
     """
-    agents = [LJALAgent(env.num_actions, list(graph.neighbors(i))) for i in range(env.num_agents)]
+    meta_agents = [LJALAgent(env.num_actions, []) for _ in range(env.num_agents)]
     returns = np.zeros(t_max)
     counter = 0
-    m = 0
     while counter < t_max:
-        rew = run_episode(env, agents, True)
+        rew = run_episode(env, meta_agents, True)
         returns[counter] = rew
-        m = max(rew, m)
         counter += 1
-    return agents, returns, m
+    return meta_agents, returns
 
 
 if __name__ == '__main__':
-    ctr = 0
+    t_max = 1500
 
-    num_plays = 200
     num_agents = 7
     num_actions = 4
+    num_runs = 100
+    num_plays = 200
+    runs = 1000
 
-    labels = ["IL", "JAL", "LJAL-1", "OptLJAL-1", "OptLJAL-2"]
+    # with meta loops
+    ctr = 0
+    labels = ["OptLJAL-1", "OptLJAL-2"]
+    envs = [
+        CGGame(num_agents, num_actions, num_runs, num_plays, 1), # OptLJAL-1
+        CGGame(num_agents, num_actions, num_runs, num_plays, 2) # OptLJAL-2
+    ]
+    meta_totals = np.array([np.zeros(num_plays) for _ in range(len(envs))])
+    for env in envs:
+        t1 = time.time()
+        meta_agents, returns = train_CG(env, t_max)
+        meta_totals[ctr] += returns
+        t2 = time.time()
+        print(f"{labels[ctr]} time: ", t2-t1)
+        ctr += 1
+    meta_totals[ctr] = meta_totals[ctr]/runs
+
+    # without meta loops
+    ctr = 0
+    labels = ["IL", "JAL", "LJAL"]
     graphs = [
         DCOP_generate_IL(),
         DCOP_generate_JAL(),
-        DCOP_generate_JLAL_1(),
-        GC_generate_OPTJLAL(1),
-        GC_generate_OPTJLAL(2)
+        DCOP_generate_JLAL_1()
     ]
-
-    totals = np.array([np.zeros(num_plays) for _ in range(len(graphs))])
-
+    nonmeta_totals = np.array([np.zeros(num_plays) for _ in range(len(graphs))])
     for graph in graphs:
         t1 = time.time()
-        for i in range(1000):
-            if i % 1000 == 0:
-                print(i)
-            env = CGGame(num_agents, num_actions)
-            agents, returns, m = train_DCOP(env, graph, num_plays)
-            totals[ctr] += returns
-        totals[ctr] = totals[ctr] / 1000
-        ctr += 1
+        for i in range(runs):
+            env = DCOPGame(num_agents, num_actions)
+            agents, returns = train_DCOP(env, graph, num_plays)
+            nonmeta_totals[ctr] += returns
+        nonmeta_totals[ctr] = nonmeta_totals[ctr]/runs
         t2 = time.time()
-        print("time: ", t2 - t1)
+        print(f"{labels[ctr]} time: ", t2-t1)
+        ctr += 1
 
-    for i in range(len(totals)):
-        plt.plot(totals[i], label=labels[i])
+    # for i in range(len(totals)):
+    #     plt.plot(totals[i], label=labels[i])
 
-    plt.legend()
-    plt.show()
+    # plt.legend()
+    # plt.show()

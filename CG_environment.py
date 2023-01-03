@@ -1,4 +1,7 @@
+from itertools import permutations
 import numpy as np
+from DCOP_environment import DCOPGame
+from DCOP_runner import train_DCOP
 
 from Graph import generate_random_graph
 
@@ -10,34 +13,22 @@ class CGGame:
     CG Game environment.
     """
 
-    def __init__(self, num_agents, num_actions, graph):
+    def __init__(self, num_agents, num_actions, num_runs, num_plays, complexity):
+
+        self.num_meta_agents = num_agents
         self.num_agents = num_agents
         self.num_actions = num_actions
-        self.initialize_weights_and_rewards()
-        self.graph = graph
+        self.num_runs = num_runs
+        self.num_plays = num_plays
+        self.graph = generate_random_graph(self.num_meta_agents, 0)
+        self.complexity = complexity
+        if complexity == 1:
+            self.perms = None
+            self.num_actions = self.num_meta_agents
+        elif complexity == 2:
+            self.perms = list(permutations(range(7), 2))
+            self.num_actions = len(self.perms)
 
-    def initialize_weights_and_rewards(self):
-        """
-        This function is used to initialize the weights and rewards for each
-        action of both agents connected by an edge in the graph.
-        The variant implemented in this function is the graph in fig. 5 of the paper.
-        another function can be created and used in __init__ instead if another
-        scenario is being tested.
-
-        The rewards are implemented like this:
-        Each edge of the graph represents a binary constraint and has 2 nodes connected
-        to it. Therefore, for every edge, there is a (n_actions * n_actions) matrix
-        containing the rewards for that specific edge. The global reward is then
-        obtained by adding all the rewards multiplied by their weight together.
-        """
-        self.weights = {}  # weights of all the edges of the graph
-        self.rewards = {}  # rewards of all the edges of the graph
-
-        for c in self.weights.keys():  # for each constraint
-            # N(0, sigma*w_i) with sigma = 10 * # agents
-            # n_actions per agent -> each edge has a n_actions * n_actions payoff matrix
-            self.rewards[c] = np.random.normal(0, self.weights[c] * (self.num_agents * CONSTANT),
-                                               size=(self.num_actions, self.num_actions))
 
     def act(self, actions: list[int]):
         """
@@ -45,14 +36,28 @@ class CGGame:
         :param action: The joint action.
         :return: The reward.
         """
-        total = 0
-        # sum for i=1 to m
-        for (n1, n2) in list(self.graph.edges):
-            a1, a2 = actions[n1], actions[n2]
-            # c_i * (v(x_a), ... , v(x_k))
-            total += self.weights[(n1, n2)] * (self.rewards[(n1, n2)][a1][a2])
 
-        return total
+        self.graph = generate_random_graph(self.num_meta_agents, 0)
+        if self.complexity == 1:
+            for i in range(len(actions)):
+                neighbor = actions[i]
+                agent = i
+                if agent != neighbor:
+                    self.graph.add_edge(agent, neighbor)
+        elif self.complexity == 2:
+            for i in range(len(actions)):
+                n1, n2 = self.perms(i)
+                if n1 != i:
+                    self.graph.add_edge(i, n1)
+                if n2 != i:
+                    self.graph.add_edge(i, n2)
+
+        rew = np.zeros(self.num_runs)
+        for i in range(self.num_runs):
+            DCOP_env = DCOPGame(self.num_agents, self.num_actions)
+            agents, returns = train_DCOP(DCOP_env, self.graph, self.num_plays)
+            rew[i] = np.mean(returns)
+        return np.mean(rew)
 
 
 if __name__ == "__main__":
