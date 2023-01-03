@@ -67,7 +67,7 @@ class DCOPGame:
         self.graph = generate_random_graph(self.num_agents, self.num_agents-1, False) # undirected complete graph
         self.weights = {} # weights of all the edges of the graph
 
-        # the rest have a weight of 0.1
+        # random weights € [0, 1]
         for (a, b) in list(self.graph.edges):
             self.weights[(a, b)] = round(random.random(), 2)
 
