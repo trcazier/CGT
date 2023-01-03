@@ -13,7 +13,7 @@ class CGGame:
     CG Game environment.
     """
 
-    def __init__(self, num_agents, num_actions, num_runs, num_plays, complexity):
+    def __init__(self, num_agents, num_actions, num_runs, num_plays, complexity, deterministic=True):
 
         self.num_meta_agents = num_agents
         self.num_agents = num_agents
@@ -22,6 +22,7 @@ class CGGame:
         self.num_plays = num_plays
         self.graph = generate_random_graph(self.num_meta_agents, 0)
         self.complexity = complexity
+        self.deterministic = deterministic
         if complexity == 1:
             self.perms = None
             self.num_actions = self.num_meta_agents
@@ -54,7 +55,7 @@ class CGGame:
 
         rew = np.zeros(self.num_runs)
         for i in range(self.num_runs):
-            DCOP_env = DCOPGame(self.num_agents, self.num_actions)
+            DCOP_env = DCOPGame(self.num_agents, self.num_actions, self.deterministic)
             agents, returns = train_DCOP(DCOP_env, self.graph, self.num_plays)
             rew[i] = np.mean(returns)
         return np.mean(rew)

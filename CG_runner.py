@@ -44,8 +44,7 @@ def train_CG(env: CGGame, t_max: int) -> Tuple[List[LJALAgent], ndarray]:
         counter += 1
     return meta_agents, returns
 
-
-if __name__ == '__main__':
+def run_exp_3(deterministic):
     t_max = 1500
 
     num_agents = 7
@@ -58,8 +57,8 @@ if __name__ == '__main__':
     ctr = 0
     labels = ["OptLJAL-1", "OptLJAL-2"]
     envs = [
-        CGGame(num_agents, num_actions, num_runs, num_plays, 1), # OptLJAL-1
-        CGGame(num_agents, num_actions, num_runs, num_plays, 2) # OptLJAL-2
+        CGGame(num_agents, num_actions, num_runs, num_plays, 1, deterministic), # OptLJAL-1
+        CGGame(num_agents, num_actions, num_runs, num_plays, 2, deterministic) # OptLJAL-2
     ]
     meta_totals = np.array([np.zeros(num_plays) for _ in range(len(envs))])
     for env in envs:
@@ -83,7 +82,7 @@ if __name__ == '__main__':
     for graph in graphs:
         t1 = time.time()
         for i in range(runs):
-            env = DCOPGame(num_agents, num_actions)
+            env = DCOPGame(num_agents, num_actions, deterministic)
             agents, returns = train_DCOP(env, graph, num_plays)
             nonmeta_totals[ctr] += returns
         nonmeta_totals[ctr] = nonmeta_totals[ctr]/runs
@@ -96,3 +95,8 @@ if __name__ == '__main__':
 
     # plt.legend()
     # plt.show()
+
+
+if __name__ == '__main__':
+    run_exp_3(True)
+    run_exp_3(False)
