@@ -72,9 +72,9 @@ if __name__ == '__main__':
             agents, returns = train_DCOP(env, graph, num_plays)
             totals[ctr] += returns
         totals[ctr] = totals[ctr]/runs
-        ctr += 1
         t2 = time.time()
         print(f"{labels[ctr]} time: ", t2-t1)
+        ctr += 1
 
     for i in range(len(totals)):
         plt.plot(totals[i], label=labels[i])
