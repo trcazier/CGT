@@ -20,7 +20,6 @@ class LJALAgent:
         self.q_table = {}
         self.plays = 0
         self.temperature = 1000
-        self.minimum_temperature = 0.01
 
     def init_n_counts(self):
         counts = {}
@@ -54,21 +53,12 @@ class LJALAgent:
         :return: The action.
         """
         self.plays += 1
-        self.temperature = max(1000 * pow(0.94, self.plays), self.minimum_temperature)
+        self.temperature = 1000 * pow(0.94, self.plays)
         evaluations = self.compute_evaluations()
-        probabilities = np.zeros(self.num_actions)
-        to_exp = [ev / self.temperature for ev in evaluations]
-        diff = max(to_exp) - 700
-        if diff > 0:
-            to_exp = list(map(lambda x: x - diff, to_exp))
-        total_sum = sum(np.exp(x) for x in to_exp)
-
-        for action in range(0, self.num_actions):
-            p = np.exp(to_exp[action]) / total_sum
-            if np.isnan(p):
-                probabilities[action] = 1
-            else:
-                probabilities[action] = p
+        exp_evaluations = np.array([ev / self.temperature for ev in evaluations])
+        max_eval = exp_evaluations.max()
+        exp_evaluations = np.exp(exp_evaluations - max_eval)
+        probabilities = exp_evaluations/exp_evaluations.sum()
 
         action = np.random.choice(range(0, self.num_actions), p=probabilities)
         return action

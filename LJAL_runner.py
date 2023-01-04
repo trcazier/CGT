@@ -1,3 +1,4 @@
+import time
 from typing import Tuple, List
 
 import numpy as np
@@ -48,16 +49,24 @@ def train_LJAL(env: NArmedBanditGame, graph, t_max: int) -> Tuple[List[LJALAgent
 if __name__ == '__main__':
     totals = np.array([np.zeros(200) for i in range(4)])
     ctr = 0
+
+    num_plays = 200
+    num_agents = 5
+    num_actions = 4
+    runs = 100
+
     labels = ["IQL", "LJAL-2", "LJAL-3", "JAL"]
+
     for edges in [0, 2, 3, 4]:
-        for i in range(1000):
-            if i % 1000 == 0:
-                print(i)
-            env = NArmedBanditGame(5, 4)
-            graph = generate_random_graph(5, edges)
-            agents, returns = train_LJAL(env, graph, 200)
+        t1 = time.time()
+        for i in range(runs):
+            env = NArmedBanditGame(num_agents, num_actions)
+            graph = generate_random_graph(num_agents, edges)
+            agents, returns = train_LJAL(env, graph, num_plays)
             totals[ctr] += returns
         totals[ctr] = totals[ctr]/1000
+        t2 = time.time()
+        print(f"{labels[ctr]} time: ", t2-t1)
         ctr += 1
 
     for i in range(len(totals)):

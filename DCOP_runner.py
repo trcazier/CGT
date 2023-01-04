@@ -52,7 +52,7 @@ if __name__ == '__main__':
     num_plays = 200
     num_agents = 7
     num_actions = 4
-    runs = 1000
+    runs = 100
 
     labels = ["IL", "JAL", "LJAL-1", "LJAL-2", "LJAL-3"]
     graphs = [
