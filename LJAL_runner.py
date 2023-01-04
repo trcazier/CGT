@@ -3,6 +3,7 @@ from typing import Tuple, List
 
 import numpy as np
 from numpy import ndarray
+from scipy.stats import ttest_ind
 
 from Graph import generate_random_graph
 from LJAL_agent import LJALAgent
@@ -53,9 +54,11 @@ if __name__ == '__main__':
     num_plays = 200
     num_agents = 5
     num_actions = 4
-    runs = 100
+    runs = 10
 
     labels = ["IQL", "LJAL-2", "LJAL-3", "JAL"]
+    solution_quality = np.array([np.zeros(runs) for _ in range(len(labels))])
+    run_times = np.zeros(len(labels))
 
     for edges in [0, 2, 3, 4]:
         t1 = time.time()
@@ -63,11 +66,61 @@ if __name__ == '__main__':
             env = NArmedBanditGame(num_agents, num_actions)
             graph = generate_random_graph(num_agents, edges)
             agents, returns = train_LJAL(env, graph, num_plays)
+            solution_quality[ctr][i] = returns[num_plays-1]
             totals[ctr] += returns
         totals[ctr] = totals[ctr]/1000
         t2 = time.time()
+        run_times[ctr] = t2-t1
         print(f"{labels[ctr]} time: ", t2-t1)
         ctr += 1
+
+    for i in range(0, len(labels)):
+        for j in range(i + 1, len(labels)):
+            v1 = solution_quality[i]
+            v2 = solution_quality[j]
+            _stat, p = ttest_ind(v1, v2)
+            if p >= 0.05:
+                print("T-test: Solution qualities for {} and {} are NOT significantly different.".format(labels[i], labels[j]))
+            t1 = run_times[i]
+            t2 = run_times[j]
+            _stat2, p2 = ttest_ind(t1, t2)
+            if p2 >= 0.05:
+                print("T-test: Run-times for {} and {} are NOT significantly different.".format(labels[i], labels[j]))
+
+    fig, ax = plt.subplots()
+
+    fig.patch.set_visible(False)
+    ax.axis('off')
+
+    solution_quality = np.mean(solution_quality, axis=1)
+    solution_quality = np.array(list(map(lambda x: round(x/solution_quality[len(labels)-1] * 100, 1), solution_quality)))
+    run_times = np.array(list(map(lambda x: round(run_times[len(labels)-1]/x, 1), run_times)))
+
+    sq = pd.DataFrame([solution_quality], columns=labels)
+    rt = pd.DataFrame([run_times], columns=labels)
+    sq.style.set_caption("Solution quality")
+    rt.style.set_caption("Speed")
+
+    table = ax.table(cellText=sq.values, colLabels=sq.columns, loc='center')
+    table.auto_set_font_size(False)
+    table.set_fontsize(8)
+
+    fig.tight_layout()
+    plt.show()
+    plt.clf()
+
+    fig, ax = plt.subplots()
+
+    fig.patch.set_visible(False)
+    ax.axis('off')
+
+    table = ax.table(cellText=rt.values, colLabels=rt.columns, loc='center')
+    table.auto_set_font_size(False)
+    table.set_fontsize(8)
+
+    fig.tight_layout()
+    plt.show()
+    plt.clf()
 
     for i in range(len(totals)):
         plt.plot(totals[i], label=labels[i])
