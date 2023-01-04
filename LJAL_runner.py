@@ -54,7 +54,7 @@ if __name__ == '__main__':
     num_plays = 200
     num_agents = 5
     num_actions = 4
-    runs = 10
+    runs = 1000
 
     labels = ["IQL", "LJAL-2", "LJAL-3", "JAL"]
     solution_quality = np.array([np.zeros(runs) for _ in range(len(labels))])
@@ -68,7 +68,7 @@ if __name__ == '__main__':
             agents, returns = train_LJAL(env, graph, num_plays)
             solution_quality[ctr][i] = returns[num_plays-1]
             totals[ctr] += returns
-        totals[ctr] = totals[ctr]/1000
+        totals[ctr] = totals[ctr]/runs
         t2 = time.time()
         run_times[ctr] = t2-t1
         print(f"{labels[ctr]} time: ", t2-t1)
