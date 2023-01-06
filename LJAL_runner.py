@@ -13,8 +13,8 @@ import pandas as pd
 from LJAL_environment import NArmedBanditGame
 
 
-def run_episode(env: NArmedBanditGame, agents, training: bool) -> float:
-    actions = [agent.act(training=training) for agent in agents]
+def run_episode(env: NArmedBanditGame, agents) -> float:
+    actions = [agent.act() for agent in agents]
     rew = env.act(actions)
     for i in range(len(agents)):
         other_actions = {}
@@ -37,28 +37,27 @@ def train_LJAL(env: NArmedBanditGame, graph, t_max: int) -> Tuple[List[LJALAgent
     :return: Tuple containing the list of agents, the returns of all training episodes, the averaged evaluation
     return of each evaluation, and the list of the greedy joint action of each evaluation.
     """
-    agents = [LJALAgent(4, list(graph.neighbors(i))) for i in range(5)]
+    agents = [LJALAgent(4, sorted(list(graph.neighbors(i))), 0.92) for i in range(env.num_agents)]
     returns = np.zeros(t_max)
     counter = 0
     while counter < t_max:
-        rew = run_episode(env, agents, True)
+        rew = run_episode(env, agents)
         returns[counter] = rew
         counter += 1
     return agents, returns
 
 
 if __name__ == '__main__':
-    totals = np.array([np.zeros(200) for i in range(4)])
     ctr = 0
 
     num_plays = 200
-    num_agents = 5
+    num_agents = 7
     num_actions = 4
-    runs = 10
-
+    runs = 500
     labels = ["IQL", "LJAL-2", "LJAL-3", "JAL"]
     solution_quality = np.array([np.zeros(runs) for _ in range(len(labels))])
     run_times = np.zeros(len(labels))
+    totals = np.array([np.zeros(num_plays) for i in range(4)])
 
     for edges in [0, 2, 3, 4]:
         t1 = time.time()
@@ -68,7 +67,7 @@ if __name__ == '__main__':
             agents, returns = train_LJAL(env, graph, num_plays)
             solution_quality[ctr][i] = returns[num_plays-1]
             totals[ctr] += returns
-        totals[ctr] = totals[ctr]/1000
+        totals[ctr] = totals[ctr]/runs
         t2 = time.time()
         run_times[ctr] = t2-t1
         print(f"{labels[ctr]} time: ", t2-t1)
