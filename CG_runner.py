@@ -76,7 +76,7 @@ def run_exp_3(deterministic):
     graphs = [
         DCOP_generate_IL(),
         DCOP_generate_JAL(),
-        DCOP_generate_JLAL_1()
+        DCOP_generate_LJAL_1()
     ]
     nonmeta_totals = np.array([np.zeros(num_plays) for _ in range(len(graphs))])
     for graph in graphs:
