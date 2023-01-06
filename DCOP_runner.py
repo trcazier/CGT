@@ -4,7 +4,8 @@ from typing import Tuple, List
 import numpy as np
 from numpy import ndarray
 
-from Graph import DCOP_generate_IL, DCOP_generate_JAL, DCOP_generate_LJAL_1, DCOP_generate_LJAL_2, DCOP_generate_LJAL_3
+from Graph import DCOP_generate_IL, DCOP_generate_JAL, DCOP_generate_LJAL_1, DCOP_generate_LJAL_2, DCOP_generate_LJAL_3, \
+    DCOP_generate_LJAL_4
 from LJAL_agent import LJALAgent
 import matplotlib.pyplot as plt
 from scipy.stats import ttest_ind
@@ -13,8 +14,8 @@ import pandas as pd
 from DCOP_environment import DCOPGame
 
 
-def run_episode(env: DCOPGame, agents, training: bool) -> float:
-    actions = [agent.act(training=training) for agent in agents]
+def run_episode(env: DCOPGame, agents) -> float:
+    actions = [agent.act() for agent in agents]
     rew = env.act(actions)
     for i in range(len(agents)):
         other_actions = {}
@@ -37,11 +38,11 @@ def train_DCOP(env: DCOPGame, graph, t_max: int) -> Tuple[List[LJALAgent], ndarr
     :return: Tuple containing the list of agents, the returns of all training episodes, the averaged evaluation
     return of each evaluation, and the list of the greedy joint action of each evaluation.
     """
-    agents = [LJALAgent(env.num_actions, list(graph.neighbors(i))) for i in range(env.num_agents)]
+    agents = [LJALAgent(env.num_actions, sorted(list(graph.neighbors(i))), 0.94) for i in range(env.num_agents)]
     returns = np.zeros(t_max)
     counter = 0
     while counter < t_max:
-        rew = run_episode(env, agents, True)
+        rew = run_episode(env, agents)
         returns[counter] = rew
         counter += 1
     return agents, returns
@@ -53,16 +54,27 @@ if __name__ == '__main__':
     num_plays = 200
     num_agents = 7
     num_actions = 4
-    runs = 10000
+    runs = 20000
+    experiment = 0
 
-    labels = ["IL", "LJAL-1", "LJAL-2", "LJAL-3", "JAL"]
-    graphs = [
-        DCOP_generate_IL(),
-        DCOP_generate_LJAL_1(),
-        DCOP_generate_LJAL_2(),
-        DCOP_generate_LJAL_3(),
-        DCOP_generate_JAL()
-    ]
+    if experiment == 0:
+        labels = ["IL", "LJAL-1", "LJAL-2", "LJAL-3", "JAL"]
+        graphs = [
+            DCOP_generate_IL(),
+            DCOP_generate_LJAL_1(),
+            DCOP_generate_LJAL_2(),
+            DCOP_generate_LJAL_3(),
+            DCOP_generate_JAL()
+        ]
+    else:
+        labels = ["IL", "LJAL-2", "LJAL-3", "LJAL-4"]
+        graphs = [
+            DCOP_generate_IL(),
+            DCOP_generate_LJAL_2(),
+            DCOP_generate_LJAL_3(),
+            DCOP_generate_LJAL_4()
+        ]
+
 
     totals = np.array([np.zeros(num_plays) for _ in range(len(graphs))])
     solution_quality = np.array([np.zeros(runs) for _ in range(len(graphs))])
@@ -129,6 +141,7 @@ if __name__ == '__main__':
     plt.show()
     plt.clf()
 
+    colors=["blue", "red", "green", "yellow", "black"]
     for i in range(len(totals)):
         plt.plot(totals[i], label=labels[i])
 

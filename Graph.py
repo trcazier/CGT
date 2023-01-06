@@ -59,23 +59,28 @@ def DCOP_generate_LJAL_2():
     graph.add_edge(1,2)
     graph.add_edge(2,1)
 
-    graph.add_edge(2,3)
-    graph.add_edge(3,2)
+    graph.add_edge(0,1)
+    graph.add_edge(1,0)
 
-    graph.add_edge(1,3)
-    graph.add_edge(3,1)
+    graph.add_edge(0,2)
+    graph.add_edge(2,0)
 
-    graph.add_edge(5,6)
-    graph.add_edge(6,5)
+    graph.add_edge(4,5)
+    graph.add_edge(5,4)
 
     return graph
 
 def DCOP_generate_LJAL_3():
     graph = DCOP_generate_LJAL_2()
-    graph.add_edge(1,5)
-    graph.add_edge(5,1)
+    graph.add_edge(0,4)
+    graph.add_edge(4,0)
     return graph
 
+def DCOP_generate_LJAL_4():
+    graph = DCOP_generate_LJAL_2()
+    graph.add_edge(3,6)
+    graph.add_edge(6,3)
+    return graph
 
 if __name__ == "__main__":
     # tests the validity of a lot of graphs
