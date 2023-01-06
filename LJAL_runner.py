@@ -53,7 +53,8 @@ if __name__ == '__main__':
     num_plays = 200
     num_agents = 7
     num_actions = 4
-    runs = 500
+    runs = 1000
+
     labels = ["IQL", "LJAL-2", "LJAL-3", "JAL"]
     solution_quality = np.array([np.zeros(runs) for _ in range(len(labels))])
     run_times = np.zeros(len(labels))
