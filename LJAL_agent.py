@@ -20,6 +20,7 @@ class LJALAgent:
         self.q_table = {}
         self.plays = 0
         self.temperature = 1000
+        self.temperature_factor = 0.94
 
     def init_n_counts(self):
         counts = {}
@@ -53,7 +54,7 @@ class LJALAgent:
         :return: The action.
         """
         self.plays += 1
-        self.temperature = 1000 * pow(0.94, self.plays)
+        self.temperature = 1000 * pow(self.temperature_factor, self.plays)
         evaluations = self.compute_evaluations()
         exp_evaluations = np.array([ev / self.temperature for ev in evaluations])
         max_eval = exp_evaluations.max()
