@@ -35,9 +35,7 @@ def train_CG(env: CGGame, t_max: int) -> Tuple[List[LJALAgent], ndarray]:
     :return: Tuple containing the list of agents, the returns of all training episodes, the averaged evaluation
     return of each evaluation, and the list of the greedy joint action of each evaluation.
     """
-    meta_agents = [LJALAgent(env.num_actions, []) for _ in range(env.num_agents)]
-    for a in meta_agents:
-        a.temperature_factor = 0.994
+    meta_agents = [LJALAgent(env.num_actions, [], 0.994) for _ in range(env.num_agents)]
     returns = np.zeros(t_max)
     counter = 0
     while counter < t_max:
