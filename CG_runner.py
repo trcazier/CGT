@@ -42,9 +42,9 @@ def run_exp_3(deterministic):
 
     num_agents = 7
     num_actions = 4
-    num_runs = 1
-    num_plays = 200
-    runs = 1
+    num_runs = 5
+    num_plays = 1
+    runs = 10
 
     # with meta loops
     ctr = 0
@@ -64,6 +64,8 @@ def run_exp_3(deterministic):
             print(f"run {i + 1}/{runs} done, estimated time left: {time_left}")
         t2 = time.time()
         print(f"{meta_labels[ctr]} time: ", t2 - t1)
+        for i in range(num_agents):
+            print(list(env.graph.neighbors(i)))
         meta_totals[ctr] = meta_totals[ctr] / runs
         ctr += 1
 
@@ -88,14 +90,10 @@ def run_exp_3(deterministic):
         print(f"{labels[ctr]} time: ", t2 - t1)
         ctr += 1
 
-    print(np.mean(nonmeta_solution_quality, axis=1))
     nonmeta_solution_quality = list(map(lambda x: [x] * t_max, np.mean(nonmeta_solution_quality, axis=1)))
-    print(nonmeta_solution_quality)
 
     labels = meta_labels + labels
     totals = list(meta_totals) + nonmeta_solution_quality
-    print(labels)
-    print(totals)
     for i in range(len(totals)):
         plt.plot(totals[i], label=labels[i])
 
@@ -104,5 +102,5 @@ def run_exp_3(deterministic):
 
 
 if __name__ == '__main__':
-    run_exp_3(True)
-    #run_exp_3(False)
+    #run_exp_3(True)
+    run_exp_3(False)
