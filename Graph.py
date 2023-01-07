@@ -82,6 +82,22 @@ def DCOP_generate_LJAL_4():
     graph.add_edge(6,3)
     return graph
 
+def DCOP_generate_LJAL_5():
+    graph = DCOP_generate_LJAL_2()
+    graph.add_edge(3,4)
+    graph.add_edge(4,3)
+    graph.add_edge(3,6)
+    graph.add_edge(6,3)
+    graph.add_edge(6,4)
+    graph.add_edge(4,6)
+    graph.add_edge(3,0)
+    graph.add_edge(0,3)
+    graph.add_edge(3,5)
+    graph.add_edge(5,3)
+    graph.add_edge(5,0)
+    graph.add_edge(0,5)
+    return graph
+
 if __name__ == "__main__":
     # tests the validity of a lot of graphs
     for nod in range(5, 10):

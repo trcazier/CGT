@@ -5,7 +5,7 @@ import numpy as np
 from numpy import ndarray
 
 from Graph import DCOP_generate_IL, DCOP_generate_JAL, DCOP_generate_LJAL_1, DCOP_generate_LJAL_2, DCOP_generate_LJAL_3, \
-    DCOP_generate_LJAL_4
+    DCOP_generate_LJAL_4, DCOP_generate_LJAL_5
 from LJAL_agent import LJALAgent
 import matplotlib.pyplot as plt
 from scipy.stats import ttest_ind
@@ -55,7 +55,8 @@ if __name__ == '__main__':
     num_agents = 7
     num_actions = 4
     runs = 20000
-    experiment = 0
+    experiment = 3
+    only_binary = True
 
     if experiment == 0:
         labels = ["IL", "LJAL-1", "LJAL-2", "LJAL-3", "JAL"]
@@ -66,7 +67,7 @@ if __name__ == '__main__':
             DCOP_generate_LJAL_3(),
             DCOP_generate_JAL()
         ]
-    else:
+    elif experiment == 1:
         labels = ["IL", "LJAL-2", "LJAL-3", "LJAL-4"]
         graphs = [
             DCOP_generate_IL(),
@@ -74,7 +75,14 @@ if __name__ == '__main__':
             DCOP_generate_LJAL_3(),
             DCOP_generate_LJAL_4()
         ]
-
+    else:
+        labels = ["IL", "LJAL-2", "LJAL-5"]
+        graphs = [
+            DCOP_generate_IL(),
+            DCOP_generate_LJAL_2(),
+            DCOP_generate_LJAL_5()
+        ]
+        only_binary = False
 
     totals = np.array([np.zeros(num_plays) for _ in range(len(graphs))])
     solution_quality = np.array([np.zeros(runs) for _ in range(len(graphs))])
@@ -83,7 +91,7 @@ if __name__ == '__main__':
     for graph in graphs:
         t1 = time.time()
         for i in range(runs):
-            env = DCOPGame(num_agents, num_actions)
+            env = DCOPGame(num_agents, num_actions, only_binary=only_binary)
             agents, returns = train_DCOP(env, graph, num_plays)
             totals[ctr] += returns
             solution_quality[ctr][i] = returns[num_plays-1]

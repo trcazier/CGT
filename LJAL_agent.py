@@ -90,4 +90,4 @@ class LJALAgent:
         self.count[(act, neighbour_actions)] += 1
         count = self.count[(act, neighbour_actions)]
 
-        self.q_table[(act, neighbour_actions)] = current_estimate + 0.5 * (rew - current_estimate)
+        self.q_table[(act, neighbour_actions)] = current_estimate + (1/count) * (rew - current_estimate)
