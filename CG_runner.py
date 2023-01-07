@@ -69,7 +69,7 @@ def run_exp_3(deterministic):
 
     # without meta loops
     ctr = 0
-    labels = ["IL", "JAL", "LJAL"]
+    labels = ["IL", "JAL", "LJAL-1"]
     graphs = [
         DCOP_generate_IL(),
         DCOP_generate_JAL(),
@@ -88,10 +88,14 @@ def run_exp_3(deterministic):
         print(f"{labels[ctr]} time: ", t2 - t1)
         ctr += 1
 
-    nonmeta_solution_quality = np.array(list(map(lambda x: [x] * t_max, np.mean(nonmeta_solution_quality, axis=1))))
+    print(np.mean(nonmeta_solution_quality, axis=1))
+    nonmeta_solution_quality = list(map(lambda x: [x] * t_max, np.mean(nonmeta_solution_quality, axis=1)))
+    print(nonmeta_solution_quality)
 
     labels = meta_labels + labels
-    totals = meta_totals + nonmeta_solution_quality
+    totals = list(meta_totals) + nonmeta_solution_quality
+    print(labels)
+    print(totals)
     for i in range(len(totals)):
         plt.plot(totals[i], label=labels[i])
 
@@ -101,4 +105,4 @@ def run_exp_3(deterministic):
 
 if __name__ == '__main__':
     run_exp_3(True)
-    run_exp_3(False)
+    #run_exp_3(False)
