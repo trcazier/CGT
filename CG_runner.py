@@ -16,10 +16,10 @@ from CG_environment import CGGame
 
 def run_episode(env: CGGame, meta_agents, training: bool) -> float:
 
-    actions = [meta_agent.act(training=training) for meta_agent in meta_agents]
+    actions = [meta_agent.act() for meta_agent in meta_agents]
     rew = env.act(actions)
     for i in range(len(meta_agents)):
-        meta_agents[i].learn(actions[i], [], rew)
+        meta_agents[i].learn(actions[i], {}, rew)
     return rew
 
 
@@ -45,29 +45,40 @@ def train_CG(env: CGGame, t_max: int) -> Tuple[List[LJALAgent], ndarray]:
     return meta_agents, returns
 
 def run_exp_3(deterministic):
+    if deterministic:
+        print("deterministic")
+    else:
+        print("non-deterministic")
+
     t_max = 1500
 
     num_agents = 7
     num_actions = 4
-    num_runs = 100
+    num_runs = 5
     num_plays = 200
-    runs = 1000
+    runs = 1
 
     # with meta loops
     ctr = 0
-    labels = ["OptLJAL-1", "OptLJAL-2"]
+    meta_labels = ["OptLJAL-1", "OptLJAL-2"]
     envs = [
         CGGame(num_agents, num_actions, num_runs, num_plays, 1, deterministic), # OptLJAL-1
         CGGame(num_agents, num_actions, num_runs, num_plays, 2, deterministic) # OptLJAL-2
     ]
-    meta_totals = np.array([np.zeros(num_plays) for _ in range(len(envs))])
+    meta_totals = np.array([np.zeros(t_max) for _ in range(len(envs))])
     for env in envs:
         t1 = time.time()
-        meta_agents, returns = train_CG(env, t_max)
-        meta_totals[ctr] += returns
+        for i in range(runs):
+            meta_agents, returns = train_CG(env, t_max)
+            meta_totals[ctr] += returns
+            tt2 = time.time()
+            time_done = tt2-t1
+            time_left = (time_done / (i+1)) * (runs-(i+1))
+            print(f"run {i+1}/{runs} done, estimated time left: {time_left}")
         t2 = time.time()
-        print(f"{labels[ctr]} time: ", t2-t1)
+        print(f"{meta_labels[ctr]} time: ", t2-t1)
         ctr += 1
+    #TODO: does not work apparently
     meta_totals[ctr] = meta_totals[ctr]/runs
 
     # without meta loops
@@ -78,10 +89,11 @@ def run_exp_3(deterministic):
         DCOP_generate_JAL(),
         DCOP_generate_LJAL_1()
     ]
-    nonmeta_totals = np.array([np.zeros(num_plays) for _ in range(len(graphs))])
+    nonmeta_totals = np.array([np.zeros(t_max) for _ in range(len(graphs))])
     for graph in graphs:
         t1 = time.time()
         for i in range(runs):
+            print(i)
             env = DCOPGame(num_agents, num_actions, deterministic)
             agents, returns = train_DCOP(env, graph, num_plays)
             nonmeta_totals[ctr] += returns
@@ -90,11 +102,13 @@ def run_exp_3(deterministic):
         print(f"{labels[ctr]} time: ", t2-t1)
         ctr += 1
 
-    # for i in range(len(totals)):
-    #     plt.plot(totals[i], label=labels[i])
+    labels = meta_labels + labels
+    totals = meta_totals + nonmeta_totals
+    for i in range(len(totals)):
+        plt.plot(totals[i], label=labels[i])
 
-    # plt.legend()
-    # plt.show()
+    plt.legend()
+    plt.show()
 
 
 if __name__ == '__main__':

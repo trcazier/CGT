@@ -47,7 +47,7 @@ class CGGame:
                     self.graph.add_edge(agent, neighbor)
         elif self.complexity == 2:
             for i in range(len(actions)):
-                n1, n2 = self.perms(i)
+                n1, n2 = self.perms[i]
                 if n1 != i:
                     self.graph.add_edge(i, n1)
                 if n2 != i:
