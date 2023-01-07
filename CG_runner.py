@@ -43,7 +43,7 @@ def run_exp_3(deterministic):
     num_agents = 7
     num_actions = 4
     num_runs = 5
-    num_plays = 1
+    num_plays = 200
     runs = 10
 
     # with meta loops
