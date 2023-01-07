@@ -44,7 +44,7 @@ def run_exp_3(deterministic):
     num_actions = 4
     num_runs = 5
     num_plays = 200
-    runs = 10
+    runs = 1
 
     # with meta loops
     ctr = 0
@@ -102,5 +102,5 @@ def run_exp_3(deterministic):
 
 
 if __name__ == '__main__':
-    #run_exp_3(True)
-    run_exp_3(False)
+    run_exp_3(True)
+    #run_exp_3(False)

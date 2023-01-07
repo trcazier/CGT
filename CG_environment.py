@@ -50,7 +50,7 @@ class CGGame:
         for i in range(self.num_runs):
             DCOP_env = DCOPGame(self.num_agents, self.num_actions, self.deterministic)
             agents, returns = train_DCOP(DCOP_env, self.graph, self.num_plays)
-            rew[i] = np.mean(returns)
+            rew[i] = returns[self.num_plays-1]
         return np.mean(rew)
 
 
