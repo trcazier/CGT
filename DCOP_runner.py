@@ -27,17 +27,6 @@ def run_episode(env: DCOPGame, agents) -> float:
 
 
 def train_DCOP(env: DCOPGame, graph, t_max: int) -> Tuple[List[LJALAgent], ndarray]:
-    """
-    Training loop.
-
-    :param temperature:
-    :param env: The gym environment.
-    :param t_max: The number of timesteps.
-    :param evaluate_every: Evaluation frequency.
-    :param num_evaluation_episodes: Number of episodes for evaluation.
-    :return: Tuple containing the list of agents, the returns of all training episodes, the averaged evaluation
-    return of each evaluation, and the list of the greedy joint action of each evaluation.
-    """
     agents = [LJALAgent(env.num_actions, sorted(list(graph.neighbors(i))), 0.94) for i in range(env.num_agents)]
     returns = np.zeros(t_max)
     counter = 0

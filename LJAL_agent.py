@@ -3,17 +3,11 @@ import json
 
 
 class LJALAgent:
-    """
-    The agent class for par 3.2.
-    """
 
     def __init__(self,
                  num_actions: int,
                  neigbours: list = [],
                  temp_fact: float = 0.94):
-        """
-        :param num_actions: Number of actions.
-        """
         self.num_actions = num_actions
         self.count = {}
         self.neighbours = neigbours
@@ -48,12 +42,6 @@ class LJALAgent:
         return evaluations
 
     def act(self) -> int:
-        """
-        Return the action.
-
-        :param training: Boolean flag for training.
-        :return: The action.
-        """
         self.temperature = 1000 * pow(self.temp_fact, self.plays)
         evaluations = self.compute_evaluations()
         exp_evaluations = np.array([ev / self.temperature for ev in evaluations])
@@ -65,13 +53,6 @@ class LJALAgent:
         return action
 
     def learn(self, act: int, other_actions: dict[int, int], rew: float) -> None:
-        """
-        Update the Q-Value.
-
-        :param other_actions: the actions of the other agents.
-        :param act: The action.
-        :param rew: The reward.
-        """
         neighbour_actions = []
         for (agent, action) in other_actions.items():
             if agent in self.neighbours:

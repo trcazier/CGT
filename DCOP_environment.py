@@ -99,27 +99,23 @@ class DCOPGame:
                                                size=(self.num_actions, self.num_actions))
 
     def act(self, actions: list[int]):
-        """
-        Method to perform an action in the DCOP Game and obtain the total global reward.
-        :param action: The joint action.
-        :return: The reward.
-        """
         total = 0
         # sum for i=1 to m
-        for v in list(self.graph.nodes):
-            a = actions[v]
-            # c_i * (v(x_a), ... , v(x_k))
-            total += self.rewards[(v,)][a]
+        if not self.only_binary:
+            for v in list(self.graph.nodes):
+                a = actions[v]
+                # c_i * (v(x_a), ... , v(x_k))
+                total += self.rewards[(v,)][a]
+            for (v1, v2, v3) in itertools.combinations(list(self.graph.nodes), 3):
+                a1, a2, a3 = actions[v1], actions[v2], actions[v3]
+                # c_i * (v(x_a), ... , v(x_k))
+                total += self.rewards[(v1, v2, v3)][a1][a2][a3]
 
         for (n1, n2) in list(self.graph.edges):
             a1, a2 = actions[n1], actions[n2]
             # c_i * (v(x_a), ... , v(x_k))
             total += self.rewards[(n1, n2)][a1][a2]
 
-        for (v1, v2, v3) in itertools.combinations(list(self.graph.nodes), 3):
-            a1, a2, a3 = actions[v1], actions[v2], actions[v3]
-            # c_i * (v(x_a), ... , v(x_k))
-            total += self.rewards[(v1, v2, v3)][a1][a2][a3]
         return total
 
 
@@ -128,12 +124,3 @@ if __name__ == "__main__":
     n_agents = 7
     n_actions = 4
     game = DCOPGame(n_agents, n_actions)
-
-    # # n_agents number of loops
-    # for i in range(n_actions):
-    #     for j in range(n_actions):
-    #         for k in range(n_actions):
-    #             for l in range(n_actions):
-    #                 for m in range(n_actions):
-    #                     # also checks the array indexing does not fail
-    #                     assert game.rewards[i][j][k][l][m] == game.act([i, j, k, l, m])

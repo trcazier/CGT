@@ -1,8 +1,6 @@
 import networkx as nx
 import random
 import matplotlib.pyplot as plt
-import math
-from itertools import permutations
 
 
 def generate_random_graph(n_nodes: int, degree: int, directed: bool=True):

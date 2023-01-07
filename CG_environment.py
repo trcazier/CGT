@@ -30,14 +30,7 @@ class CGGame:
             self.perms = list(permutations(range(7), 2))
             self.num_actions = len(self.perms)
 
-
     def act(self, actions: list[int]):
-        """
-        Method to perform an action in the DCOP Game and obtain the total global reward.
-        :param action: The joint action.
-        :return: The reward.
-        """
-
         self.graph = generate_random_graph(self.num_meta_agents, 0)
         if self.complexity == 1:
             for i in range(len(actions)):
@@ -62,16 +55,6 @@ class CGGame:
 
 
 if __name__ == "__main__":
-    # test
     n_agents = 7
     n_actions = 4
     game = CGGame(n_agents, n_actions)
-
-    # # n_agents number of loops
-    # for i in range(n_actions):
-    #     for j in range(n_actions):
-    #         for k in range(n_actions):
-    #             for l in range(n_actions):
-    #                 for m in range(n_actions):
-    #                     # also checks the array indexing does not fail
-    #                     assert game.rewards[i][j][k][l][m] == game.act([i, j, k, l, m])
