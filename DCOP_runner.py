@@ -44,7 +44,7 @@ if __name__ == '__main__':
     num_agents = 7
     num_actions = 4
     runs = 20000
-    experiment = 3
+    experiment = 0
     only_binary = True
 
     if experiment == 0:

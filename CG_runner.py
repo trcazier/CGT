@@ -9,6 +9,7 @@ from DCOP_runner import train_DCOP
 from Graph import DCOP_generate_IL, DCOP_generate_JAL, DCOP_generate_LJAL_1
 from LJAL_agent import LJALAgent
 import matplotlib.pyplot as plt
+import pandas as pd
 
 from CG_environment import CGGame
 
@@ -42,9 +43,9 @@ def run_exp_3(deterministic):
 
     num_agents = 7
     num_actions = 4
-    num_runs = 5
+    num_runs = 10
     num_plays = 200
-    runs = 1
+    runs = 10
 
     # with meta loops
     ctr = 0
@@ -94,6 +95,26 @@ def run_exp_3(deterministic):
 
     labels = meta_labels + labels
     totals = list(meta_totals) + nonmeta_solution_quality
+
+    fig, ax = plt.subplots()
+
+    fig.patch.set_visible(False)
+    ax.axis('off')
+
+    solution_quality = list(map(lambda x: x[-1], totals))
+    solution_quality = np.array(list(map(lambda x: round(x/solution_quality[len(labels)-1] * 100, 1), solution_quality)))
+
+    sq = pd.DataFrame([solution_quality], columns=labels)
+    sq.style.set_caption("Solution quality")
+
+    table = ax.table(cellText=sq.values, colLabels=sq.columns, loc='center')
+    table.auto_set_font_size(False)
+    table.set_fontsize(8)
+
+    fig.tight_layout()
+    plt.show()
+    plt.clf()
+
     for i in range(len(totals)):
         plt.plot(totals[i], label=labels[i])
 
